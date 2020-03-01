@@ -1,17 +1,19 @@
 # Duplicates
 A small Python program for finding duplicate files
 
-usage: duplicates.py [-h] [--workers NUM_WORKERS] [--format {json,csv}]
-                     dirs [dirs ...]
+Duplicates recursively walks one or more directories, computes the md5 hash of each file in those directories and print a list of of files with identical hashes.
 
-NUM\_WORKERS	Number of worker threads to use (default: 6)
+    Usage: duplicates.py [-h] [--workers NUM_WORKERS] [--format {json,csv}] dirs [dirs ...]
 
-format		Output format to use.
+_workers_	
+Number of worker threads to use (default: 6)
 
-		"json" will output a list of lists of identical files
+_format_
+Output format to use.
+* "json" will output a list of lists of identical files
+* "csv" will output line deliminated lists of comma separated values.
 
-		"csv" will output line deliminated lists of comma separated values.
+_dirs_
+A list of directories to search
 
-dirs		A list of directories to search
 
-Duplicates walks the directories in dirs and computes the md5 hash of each file. 
