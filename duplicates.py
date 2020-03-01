@@ -6,15 +6,15 @@ import hashlib
 import collections
 import threading
 import concurrent.futures
-
-
+import json
 
 CHUNK_SIZE = 512000
 tasks = []
 
 parser = argparse.ArgumentParser(description='Finds duplicate files in one or more directories.')
-parser.add_argument('directories', metavar="dirs", default=".", type=str, nargs="+")
+parser.add_argument('directories', metavar="dirs", default=".", type=str, nargs="+", help="List of directories to search")
 parser.add_argument('--workers', dest='num_workers', default=6, type=int, help="Number of worker threads to use")
+parser.add_argument('--format', dest='format', choices=["json", "csv"], default="csv", help="Output format to use.")
 args = parser.parse_args()
 
 root_dirs = args.directories
@@ -47,6 +47,19 @@ for root_dir in root_dirs:
             fullpath = os.path.join(root, filename)
             tpe.submit(hashing_task(fullpath))
 
-for md5hash in files_db:
-    if len(files_db[md5hash]) > 1:
-        print([os.path.relpath(path, start=root_dir) for path in files_db[md5hash]])
+output_string = ""
+if args.format == "csv":
+    for md5hash in files_db:
+        if len(files_db[md5hash]) > 1:
+            output_string += os.linesep + files_db[md5hash][0]
+            for path in files_db[md5hash][1:]:
+                output_string += ", " + path
+elif args.format == "json":
+    #JSON list-of-lists
+    dir_list = []
+    for md5hash in files_db:
+        if len(files_db[md5hash]) > 1:
+            dir_list.append(files_db[md5hash])
+    output_string = json.dumps(dir_list)
+
+print(output_string)
